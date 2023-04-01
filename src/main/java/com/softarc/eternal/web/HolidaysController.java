@@ -6,6 +6,7 @@ import com.softarc.eternal.domain.Holiday;
 import com.softarc.eternal.domain.HolidayTrip;
 import com.softarc.eternal.multimedia.ImageValidator;
 import com.softarc.eternal.web.request.HolidayDto;
+import com.softarc.eternal.web.request.PrintingAddJob;
 import com.softarc.eternal.web.response.HolidayResponse;
 import com.softarc.eternal.web.response.HolidayTripDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,12 +19,11 @@ import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @RequestMapping("/api/holidays")
 @RestController
@@ -32,13 +32,16 @@ public class HolidaysController {
 
   private final HolidaysRepository repository;
   private final ImageValidator imageValidator;
+  private final WebClient webClient;
 
   public HolidaysController(
     HolidaysRepository repository,
-    ImageValidator imageValidator
+    ImageValidator imageValidator,
+    WebClient webClient
   ) {
     this.repository = repository;
     this.imageValidator = imageValidator;
+    this.webClient = webClient;
   }
 
   @GetMapping
@@ -77,7 +80,9 @@ public class HolidaysController {
       filename,
       Collections.emptyList()
     );
-    this.repository.save(holiday);
+    Holiday holidayEntity = this.repository.save(holiday);
+    holidayEntity.setBrochureStatus(this.orderBrochurePrint(holidayEntity));
+
     return true;
   }
 
@@ -118,6 +123,29 @@ public class HolidaysController {
     var file = Path.of("", "filestore", cover);
     FileSystemResource resource = new FileSystemResource(file);
     return new ResponseEntity<>(resource, new HttpHeaders(), HttpStatus.OK);
+  }
+
+  private BrochureStatus orderBrochurePrint(Holiday holiday) {
+    ResponseEntity<Void> returner = webClient
+      .post()
+      .uri("/api/order")
+      .contentType(MediaType.APPLICATION_JSON)
+      .bodyValue(
+        new PrintingAddJob(
+          holiday.getId(),
+          holiday.getName(),
+          holiday.getDescription()
+        )
+      )
+      .retrieve()
+      .toBodilessEntity()
+      .block();
+
+    if (returner.getStatusCode().is2xxSuccessful()) {
+      return BrochureStatus.FAILED;
+    } else {
+      return BrochureStatus.CONFIRMED;
+    }
   }
 
   private HolidayResponse toHolidayResponse(Holiday holiday) {
