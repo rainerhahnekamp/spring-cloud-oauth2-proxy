@@ -53,9 +53,4 @@ public class AppConfiguration {
       return new DefaultHolidays(holidays, calculator);
     }
   }
-
-  @Bean
-  public WebClient webClient() {
-    return WebClient.create("http://localhost:8081");
-  }
 }
