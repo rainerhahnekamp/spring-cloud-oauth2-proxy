@@ -1,6 +1,7 @@
 package com.softarc.eternal.data;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.softarc.eternal.domain.BrochureStatus;
 import com.softarc.eternal.domain.Guide;
 import com.softarc.eternal.domain.Holiday;
 import com.softarc.eternal.domain.HolidayTrip;
@@ -53,12 +54,20 @@ public class FsHolidays implements Holidays {
         1L,
         "Canada",
         "Visit Rocky Mountains",
+        BrochureStatus.REQUESTED,
         null,
         new ArrayList<>()
       )
     );
     holidays.add(
-      new Holiday(2L, "China", "To the Middle Kingdom", null, new ArrayList<>())
+      new Holiday(
+        2L,
+        "China",
+        "To the Middle Kingdom",
+        BrochureStatus.REQUESTED,
+        null,
+        new ArrayList<>()
+      )
     );
     this.currentId = this.getCurrentId();
     this.persist();
@@ -81,6 +90,7 @@ public class FsHolidays implements Holidays {
           ++this.currentId,
           name,
           description,
+          BrochureStatus.REQUESTED,
           optCover.get(),
           new ArrayList<>()
         )

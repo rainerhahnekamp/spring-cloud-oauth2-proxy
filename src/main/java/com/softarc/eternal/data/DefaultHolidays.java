@@ -1,5 +1,6 @@
 package com.softarc.eternal.data;
 
+import com.softarc.eternal.domain.BrochureStatus;
 import com.softarc.eternal.domain.Guide;
 import com.softarc.eternal.domain.Holiday;
 import com.softarc.eternal.domain.HolidayTrip;
@@ -33,6 +34,7 @@ public class DefaultHolidays implements Holidays {
       this.currentId++,
       name,
       description,
+      BrochureStatus.REQUESTED,
       optCover.orElse(""),
       new ArrayList<>()
     );

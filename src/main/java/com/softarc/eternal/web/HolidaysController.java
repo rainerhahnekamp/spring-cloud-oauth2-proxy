@@ -1,6 +1,7 @@
 package com.softarc.eternal.web;
 
 import com.softarc.eternal.data.HolidaysRepository;
+import com.softarc.eternal.domain.BrochureStatus;
 import com.softarc.eternal.domain.Holiday;
 import com.softarc.eternal.domain.HolidayTrip;
 import com.softarc.eternal.multimedia.ImageValidator;
@@ -72,6 +73,7 @@ public class HolidaysController {
       null,
       holidayDto.name(),
       holidayDto.description(),
+      BrochureStatus.REQUESTED,
       filename,
       Collections.emptyList()
     );

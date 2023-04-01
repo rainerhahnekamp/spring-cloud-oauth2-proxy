@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 import com.softarc.eternal.data.HolidaysRepository;
+import com.softarc.eternal.domain.BrochureStatus;
 import com.softarc.eternal.domain.Holiday;
 import com.softarc.eternal.domain.HolidayMother;
 import com.softarc.eternal.multimedia.ImageValidator;
@@ -57,6 +58,7 @@ public class HolidaysControllerUnitTest {
       null,
       "Vienna",
       "Urlaub in Wien",
+      BrochureStatus.REQUESTED,
       "vienna",
       Collections.emptyList()
     );

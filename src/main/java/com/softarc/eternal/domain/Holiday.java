@@ -32,6 +32,9 @@ public class Holiday {
   @NotBlank
   private String description;
 
+  @NotNull
+  private BrochureStatus brochureStatus;
+
   private String coverPath;
 
   @Builder.Default
