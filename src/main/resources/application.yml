@@ -12,6 +12,12 @@ spring:
     username: eternal
     password: eternal123
 
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: eternal
+    password: eternal123
+
   servlet.multipart:
     max-file-size: 4MB
     max-request-size: 4MB
