@@ -14,9 +14,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MessagingConfiguration {
 
-  public static final String exchangeName = "printing-events-exchange";
+  public static final String exchangeName = "printing-events";
   public static final String queueName = "printing-events-queue";
-  public static final String routingKey = exchangeName + "." + queueName;
+  public static final String routingKey = "printing.routing";
 
   @Bean
   Queue getQueue() {

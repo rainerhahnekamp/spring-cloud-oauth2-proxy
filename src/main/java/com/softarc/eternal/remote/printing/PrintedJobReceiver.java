@@ -16,15 +16,16 @@ public class PrintedJobReceiver {
   }
 
   public void processMessage(String message) {
-    log.info(message);
-    var parts = message.split(":");
-    String eventName = parts[0];
-    Long holidayId = Long.parseLong(parts[1]);
-
-    if ("printed".equals(eventName)) {
-      var holiday = this.holidaysRepository.findById(holidayId).orElseThrow();
-      holiday.setBrochureStatus(BrochureStatus.PRINTED);
-      this.holidaysRepository.save(holiday);
-    }
+    Long holidayId = Long.parseLong(message);
+    this.holidaysRepository.findById(holidayId)
+      .ifPresentOrElse(
+        holiday -> {
+          holiday.setBrochureStatus(BrochureStatus.PRINTED);
+          this.holidaysRepository.save(holiday);
+        },
+        () -> {
+          log.warning("Could not find Holiday with ID " + holidayId);
+        }
+      );
   }
 }
