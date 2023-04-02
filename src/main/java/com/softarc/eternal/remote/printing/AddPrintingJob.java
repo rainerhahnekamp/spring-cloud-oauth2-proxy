@@ -10,32 +10,24 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 public class AddPrintingJob {
 
-  private final WebClient webClient;
+  private final PrintingClient printingClient;
 
-  public AddPrintingJob(WebClient.Builder webClientBuilder) {
-    this.webClient = webClientBuilder.baseUrl("http://localhost:8081").build();
+  public AddPrintingJob(PrintingClient printingClient) {
+    this.printingClient = printingClient;
   }
 
   public BrochureStatus add(Holiday holiday) {
-    ResponseEntity<Void> returner = webClient
-      .post()
-      .uri("/api/order")
-      .contentType(MediaType.APPLICATION_JSON)
-      .bodyValue(
-        new AddPrintingJobRequest(
-          holiday.getId(),
-          holiday.getName(),
-          holiday.getDescription()
-        )
-      )
-      .retrieve()
-      .toBodilessEntity()
-      .block();
-
-    if (returner.getStatusCode().is2xxSuccessful()) {
-      return BrochureStatus.FAILED;
-    } else {
+    try {
+      this.printingClient.addPrintingJob(
+          new AddPrintingJobRequest(
+            holiday.getId(),
+            holiday.getName(),
+            holiday.getDescription()
+          )
+        );
       return BrochureStatus.CONFIRMED;
+    } catch (Exception e) {
+      return BrochureStatus.FAILED;
     }
   }
 }
