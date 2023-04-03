@@ -1,0 +1,24 @@
+app.holidays:
+  persistence-type: file
+  persistence-file: holidays.json
+  pre-seed: true
+springdoc:
+  default-produces-media-type: application/json
+
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/eternal
+    username: eternal
+    password: eternal123
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: eternal
+    password: eternal123
+
+  servlet.multipart:
+    max-file-size: 4MB
+    max-request-size: 4MB
+
