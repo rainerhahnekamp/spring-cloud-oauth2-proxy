@@ -21,4 +21,10 @@ spring:
   servlet.multipart:
     max-file-size: 4MB
     max-request-size: 4MB
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: 'http://localhost:8082/realms/eternal'
+
 

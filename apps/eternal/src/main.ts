@@ -1,4 +1,9 @@
-import { enableProdMode, importProvidersFrom, LOCALE_ID } from '@angular/core';
+import {
+  APP_INITIALIZER,
+  enableProdMode,
+  importProvidersFrom,
+  LOCALE_ID,
+} from '@angular/core';
 
 import { environment } from './environments/environment';
 import { bootstrapApplication } from '@angular/platform-browser';
@@ -24,12 +29,33 @@ import { provideRouter } from '@angular/router';
 import { registerLocaleData } from '@angular/common';
 
 import localeDeAt from '@angular/common/locales/de-AT';
-import { AuthModule } from '@auth0/auth0-angular';
+import {
+  AuthHttpInterceptor,
+  AuthModule,
+  provideAuth0,
+} from '@auth0/auth0-angular';
 import { securityProviders } from '@eternal/shared/security';
 import { FileField } from '@eternal/shared/ui';
+import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
 
 if (environment.production) {
   enableProdMode();
+}
+
+function initializeKeycloak(keycloak: KeycloakService) {
+  return () =>
+    keycloak.init({
+      config: {
+        url: 'http://localhost:8082',
+        realm: 'eternal',
+        clientId: 'account',
+      },
+      initOptions: {
+        onLoad: 'check-sso',
+        silentCheckSsoRedirectUri:
+          window.location.origin + '/assets/silent-check-sso.html',
+      },
+    });
 }
 
 registerLocaleData(localeDeAt, 'de-AT');
@@ -38,6 +64,10 @@ bootstrapApplication(AppComponent, {
   providers: [
     provideAnimations(),
     provideRouter(appRoutes),
+    provideAuth0({
+      domain: 'dev-xbu2-fid.eu.auth0.com',
+      clientId: 'YgUoOMh2jc4CQuo8Ky9PS7npW3Q4ckX9',
+    }),
 
     provideStore(),
     provideEffects([]),
@@ -47,12 +77,8 @@ bootstrapApplication(AppComponent, {
     sharedMasterDataProvider,
 
     importProvidersFrom(
+      KeycloakAngularModule,
       HttpClientModule,
-
-      AuthModule.forRoot({
-        domain: 'dev-xbu2-fid.eu.auth0.com',
-        clientId: 'YgUoOMh2jc4CQuo8Ky9PS7npW3Q4ckX9',
-      }),
       FormlyModule.forRoot({
         extras: { lazyRender: true },
         types: [
@@ -82,6 +108,12 @@ bootstrapApplication(AppComponent, {
     {
       provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
       useValue: { appearance: 'outline' },
+    },
+    {
+      provide: APP_INITIALIZER,
+      multi: true,
+      useFactory: initializeKeycloak,
+      deps: [KeycloakService],
     },
   ],
 });

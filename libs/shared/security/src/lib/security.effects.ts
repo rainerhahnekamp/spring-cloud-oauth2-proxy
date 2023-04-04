@@ -1,28 +1,39 @@
 import { inject, Injectable } from '@angular/core';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { delay, map, tap } from 'rxjs/operators';
+import { Actions, concatLatestFrom, createEffect, ofType } from '@ngrx/effects';
+import {
+  concatMap,
+  delay,
+  distinctUntilChanged,
+  filter,
+  map,
+  tap,
+} from 'rxjs/operators';
 import { securityActions } from './security.actions';
-import { ANONYMOUS_USER } from './security.reducer';
+import { ANONYMOUS_USER, User } from './security.reducer';
 import { AuthService } from '@auth0/auth0-angular';
+import { KeycloakService } from 'keycloak-angular';
+import { from, of } from 'rxjs';
 
 @Injectable()
 export class SecurityEffects {
   #actions$ = inject(Actions);
   #authService = inject(AuthService);
+  #keycloak = inject(KeycloakService);
 
   user$ = createEffect(() =>
-    this.#authService.user$.pipe(
-      delay(1000),
-      map((user) =>
+    this.#keycloak.keycloakEvents$.pipe(
+      concatMap(() => this.#keycloak.isLoggedIn()),
+      distinctUntilChanged(),
+      map((isLoggedIn) =>
         securityActions.loaded({
-          user: user
+          user: isLoggedIn
             ? {
-                id: user.email || '',
-                email: user.email || '',
-                name: user.name || '',
-                anonymous: false
+                id: '1',
+                email: 'hi',
+                name: '',
+                anonymous: false,
               }
-            : ANONYMOUS_USER
+            : ANONYMOUS_USER,
         })
       )
     )
@@ -32,7 +43,7 @@ export class SecurityEffects {
     () =>
       this.#actions$.pipe(
         ofType(securityActions.signIn),
-        tap(() => this.#authService.loginWithRedirect())
+        tap(() => this.#keycloak.login())
       ),
     { dispatch: false }
   );
@@ -41,7 +52,7 @@ export class SecurityEffects {
     () =>
       this.#actions$.pipe(
         ofType(securityActions.signOut),
-        tap(() => this.#authService.logout())
+        tap(() => this.#keycloak.logout())
       ),
     { dispatch: false }
   );

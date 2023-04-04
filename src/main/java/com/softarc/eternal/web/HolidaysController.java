@@ -25,11 +25,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.reactive.function.client.WebClient;
 
 @RequestMapping("/api/holidays")
 @RestController
 @Tag(name = "Holidays")
+@CrossOrigin(origins = "*")
 public class HolidaysController {
 
   private final HolidaysRepository repository;

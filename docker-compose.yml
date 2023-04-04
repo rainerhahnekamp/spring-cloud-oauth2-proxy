@@ -22,8 +22,15 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
-
-
+  oauth2:
+    image: quay.io/keycloak/keycloak:21.0.2
+    command:
+      - start-dev
+    environment:
+      - KEYCLOAK_ADMIN=eternal
+      - KEYCLOAK_ADMIN_PASSWORD=eternal123
+    ports:
+      - 8082:8080
 volumes:
   db_data:
   db_config:
